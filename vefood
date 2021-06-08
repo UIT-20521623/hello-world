@@ -1,0 +1,16 @@
+class Food :public Point
+{
+public:
+    void VeFood()
+    {
+        gotoxy(x, y);
+        cout << (char)219;
+    }
+    void NewFood()
+    {
+        srand(time(NULL));
+        x = (rand() % 110) + 9;
+        y = (rand() % 28) + 1;
+    }
+
+};
