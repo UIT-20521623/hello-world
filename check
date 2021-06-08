@@ -1,0 +1,152 @@
+#include <iostream>
+#include <windows.h>
+#include <cstdlib>
+#include <conio.h>
+#include <ctime>    
+using namespace std;
+
+void gotoxy(int column, int line);
+
+class Point {
+public:
+    int x, y;
+};
+class Food :public Point
+{
+public:
+    void VeFood()
+    {
+        gotoxy(x, y);
+        cout << (char)219;
+    }
+    void NewFood()
+    {
+        srand(time(NULL));
+        x = (rand() % 110) + 9;
+        y = (rand() % 28) + 1;
+    }
+
+};
+class CONRAN {
+public:
+    struct Point A[100];
+    int DoDai;
+    CONRAN() {
+        DoDai = 3;
+        A[0].x = 12; A[0].y = 10;
+        A[1].x = 11; A[1].y = 10;
+        A[2].x = 10; A[2].y = 10;
+    }
+    void Ve() {
+        for (int i = 0; i < DoDai; i++) {
+            gotoxy(A[i].x, A[i].y);
+            cout << (char)219;
+        }
+    }
+    void DiChuyen(int Huong) {
+        for (int i = DoDai - 1; i > 0; i--)
+            A[i] = A[i - 1];
+        if (Huong == 0) A[0].x = A[0].x + 1;
+        if (Huong == 1) A[0].y = A[0].y + 1;
+        if (Huong == 2) A[0].x = A[0].x - 1;
+        if (Huong == 3) A[0].y = A[0].y - 1;
+    }
+    void TangDoDai(int Huong) {
+        A[DoDai] = A[DoDai - 1];
+        this->DiChuyen(Huong);
+        this->DoDai++;
+    }
+    int GetHeadX()
+    {
+        return A[0].x;
+    }
+    int GetHeadY()
+    {
+        return A[0].y;
+    }
+    bool ktTuDam()
+    {
+        int a, b;
+        a = A[0].x;
+        b = A[0].y;
+        for (int i = 1; i < DoDai; i++)
+            if ((A[i].x == a) && (A[i].y == b))
+                return true;
+        return false;
+    }
+};
+void VeKhung()
+{
+    for (int i = 9; i <= 119; i++)
+    {
+        gotoxy(i, 0);
+        cout << (char)219;
+        gotoxy(i, 29);
+        cout << (char)219;
+    }
+    for (int i = 0; i <= 29; i++)
+    {
+        gotoxy(119, i);
+        cout << (char)219;
+        gotoxy(9, i);
+        cout << (char)219;
+    }
+}
+bool GameOver(CONRAN r)
+{
+    if (r.GetHeadX() == 9 || r.GetHeadX() == 119 || r.GetHeadY() == 0 || r.GetHeadY() == 29)
+        return true;
+    return r.ktTuDam();
+}
+
+int main()
+{
+    CONRAN r;
+    int Huong = 0;
+    char t;
+    Food food;
+    food.NewFood();
+    int state = 1;
+    while (state == 1) {
+        if (_kbhit()) {
+            t = _getch();
+            int Huongg = Huong;
+            if (t == 'a') Huong = 2;
+            if (t == 'w') Huong = 3;
+            if (t == 'd') Huong = 0;
+            if (t == 's') Huong = 1;
+            if (abs(Huong - Huongg) == 2)
+                Huong = Huongg;
+        }
+        system("cls");
+        VeKhung();
+        food.VeFood();
+        r.Ve();
+        if (r.GetHeadX() == food.x && r.GetHeadY() == food.y)
+        {
+            r.TangDoDai(Huong);
+            food.NewFood();
+        }
+        else r.DiChuyen(Huong);
+        gotoxy(0, 0);
+        cout << "Score: " << r.DoDai;
+        if (GameOver(r)) {
+            state = 0;
+        }
+        Sleep(20);
+    }
+    system("cls");
+    cout << "Game Over!!!";
+    return 0;
+}
+
+void gotoxy(int column, int line)
+{
+    COORD coord;
+    coord.X = column;
+    coord.Y = line;
+    SetConsoleCursorPosition(
+        GetStdHandle(STD_OUTPUT_HANDLE),
+        coord
+    );
+}
